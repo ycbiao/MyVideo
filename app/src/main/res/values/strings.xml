@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">MyVideo</string>
+    <string name="url_video_test">https://dianbo.ysbang.cn/8fb3b3c9vodcq1256960037/15c8746f5285890783285140708/CCbQ3dYAZVQA.mp4</string>
+    <string name="url_video_test2">https://dianbo.ysbang.cn/8fb3b3c9vodcq1256960037/5d1d396d5285890783143417625/TkH9f9IuvvUA.mp4</string>
 </resources>

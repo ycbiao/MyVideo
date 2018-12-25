@@ -7,44 +7,9 @@
         android:layout_height="match_parent"
         tools:context=".MainActivity">
 
-    <SurfaceView
-            android:id="@+id/surfaceView"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintDimensionRatio="w,1:1"/>
-
-    <SeekBar
-            android:id="@+id/seekBar"
-            android:layout_width="0dp"
-            android:layout_height="30dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/tvTotalTime"
-            android:max="100"
-            android:progress="0"
-            android:secondaryProgress="0"
-            app:layout_constraintBottom_toBottomOf="@id/surfaceView"
-            style="@style/Base.Widget.AppCompat.SeekBar"/>
-
-    <TextView
-            android:id="@+id/tvTotalTime"
-            android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:textColor="#ffffff"
-              android:text="--"
-              app:layout_constraintLeft_toRightOf="@id/seekBar"
-              app:layout_constraintRight_toRightOf="parent"
-              app:layout_constraintTop_toTopOf="@id/seekBar"
-              app:layout_constraintBottom_toBottomOf="@id/seekBar"
-                android:layout_marginRight="5dp"
-    android:layout_marginLeft="5dp"/>
-
-    <View android:layout_width="0dp"
-          android:layout_height="30dp"
-          app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="@id/surfaceView"
-        android:background="#20000000"/>
-
+    <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_main"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+    </android.support.v7.widget.RecyclerView>
 </android.support.constraint.ConstraintLayout>

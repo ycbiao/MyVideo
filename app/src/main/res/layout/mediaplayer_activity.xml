@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <SurfaceView
+            android:id="@+id/surfaceView_media"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/video_height"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"/>
+
+    <SeekBar
+            android:id="@+id/seekBar_media"
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/tvTotalTime_media"
+            android:max="100"
+            android:progress="0"
+            android:secondaryProgress="0"
+            app:layout_constraintBottom_toBottomOf="@id/surfaceView_media"
+            style="@style/Base.Widget.AppCompat.SeekBar"/>
+
+    <TextView
+            android:id="@+id/tvTotalTime_media"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#ffffff"
+            android:text="--"
+            app:layout_constraintLeft_toRightOf="@id/seekBar_media"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@id/seekBar_media"
+            app:layout_constraintBottom_toBottomOf="@id/seekBar_media"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="5dp"/>
+
+    <View android:layout_width="0dp"
+          android:layout_height="30dp"
+          app:layout_constraintLeft_toLeftOf="parent"
+          app:layout_constraintRight_toRightOf="parent"
+          app:layout_constraintBottom_toBottomOf="@id/surfaceView_media"
+          android:background="#20000000"/>
+</android.support.constraint.ConstraintLayout>
