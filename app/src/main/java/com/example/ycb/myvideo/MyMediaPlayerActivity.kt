@@ -1,6 +1,5 @@
 package com.example.ycb.myvideo
 
-import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
@@ -8,7 +7,6 @@ import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import android.view.SurfaceHolder
 import android.widget.SeekBar
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.mediaplayer_activity.*
 import java.util.*
 import kotlin.concurrent.timerTask
@@ -17,7 +15,7 @@ import kotlin.concurrent.timerTask
  * Created by biao on 2018/12/25.
  */
 class MyMediaPlayerActivity : AppCompatActivity() {
-    var mediaPlayer =  MediaPlayer()
+    private var mediaPlayer =  MediaPlayer()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,7 +29,7 @@ class MyMediaPlayerActivity : AppCompatActivity() {
     }
 
 
-    private fun set() {
+    open fun set() {
 
         var handler = Handler {
             val duration = mediaPlayer.duration
