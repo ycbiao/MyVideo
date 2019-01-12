@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity(){
         setContentView(R.layout.activity_main)
 
         recycler_main.layoutManager = GridLayoutManager(this,1)
-        recycler_main.adapter = ClassRecyclerAdapter(this, arrayListOf("mediaplayer","exoplayer"))
+        recycler_main.adapter = ClassRecyclerAdapter(this, arrayListOf("ExoPlayer播放器","MediaPlayer播放器(测试)"))
     }
 
     class ClassRecyclerAdapter(var context: Context,var list: ArrayList<String>) : RecyclerView.Adapter<ClassRecyclerAdapter.ClassViewHolder>() {
@@ -43,10 +43,9 @@ class MainActivity : AppCompatActivity(){
                 btn_class.setOnClickListener {
 
                     if(string.equals(list[0]))
-                        context.startActivity(Intent(context,MyMediaPlayerActivity::class.java))
-                    if(string.equals(list[1]))
                         context.startActivity(Intent(context,MyExoPlayerActivity::class.java))
-
+                    if(string.equals(list[1]))
+                        context.startActivity(Intent(context,MyMediaPlayerActivity::class.java))
                 }
             }
         }

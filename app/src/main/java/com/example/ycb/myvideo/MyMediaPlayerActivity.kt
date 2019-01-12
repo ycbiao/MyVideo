@@ -28,6 +28,10 @@ class MyMediaPlayerActivity : AppCompatActivity() {
         set()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        mediaPlayer.release()
+    }
 
     open fun set() {
 

@@ -14,10 +14,7 @@ import android.view.Window
 import android.view.WindowManager
 import android.widget.SeekBar
 import android.widget.TextView
-import com.google.android.exoplayer2.DefaultRenderersFactory
-import com.google.android.exoplayer2.ExoPlayerFactory
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.Timeline
+import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
@@ -36,12 +33,14 @@ class MyExoPlayerActivity : AppCompatActivity() {
 
     private var isFull = false
 
+    private lateinit var mPlayer : SimpleExoPlayer
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.exoplayer_activity)
         val trackSelector = DefaultTrackSelector()
         val renderersFactory = DefaultRenderersFactory(this)
-        val mPlayer = ExoPlayerFactory.newSimpleInstance(this, renderersFactory, trackSelector)
+        mPlayer = ExoPlayerFactory.newSimpleInstance(this, renderersFactory, trackSelector)
         exo_surfaceV.player = mPlayer
         val dataSourceFactory = DefaultHttpDataSourceFactory("ysbang.cn")
         val videoSource = ExtractorMediaSource.Factory(dataSourceFactory)
@@ -120,6 +119,32 @@ class MyExoPlayerActivity : AppCompatActivity() {
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+        mPlayer.playWhenReady = false
+        isStart = false
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        mPlayer.playWhenReady = true
+        isStart = true
+    }
+
+    override fun onBackPressed() {
+        if(isFull){
+            isFull = false
+            tv_exo_full.text = "全屏"
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        }else
+        super.onBackPressed()
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mPlayer.release()
+    }
     override fun onConfigurationChanged(newConfig: Configuration?) {
         if(this.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
         {
