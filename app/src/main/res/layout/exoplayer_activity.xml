@@ -57,4 +57,37 @@
             app:layout_constraintLeft_toRightOf="@id/seekBar_exo"
             android:layout_marginRight="5dp"
     android:layout_marginLeft="5dp"/>
+
+    <Button
+            android:id="@+id/btn_test_url"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/exo_surfaceV"
+            android:text="网络视频url"
+            android:layout_margin="10dp"
+    app:layout_constraintLeft_toLeftOf="parent"
+    app:layout_constraintRight_toRightOf="parent"/>
+
+    <Button android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+    android:id="@+id/btn_local_file"
+    android:text="打开本地文件"
+    app:layout_constraintTop_toBottomOf="@id/btn_test_url"
+    app:layout_constraintLeft_toLeftOf="parent"
+    app:layout_constraintRight_toRightOf="parent"/>
+
+    <com.example.ycb.myvideo.widget.VerticalSeekBar
+            android:id="@+id/vseekbar_volume"
+            android:layout_width="30dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            android:max="100"
+            android:progress="0"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:background="#20000000"
+            app:layout_constraintBottom_toBottomOf="@id/exo_surfaceV"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="50dp" app:layout_constraintVertical_bias="0.0"/>
+
 </android.support.constraint.ConstraintLayout>

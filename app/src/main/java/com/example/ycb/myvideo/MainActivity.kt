@@ -33,7 +33,10 @@ class MainActivity : AppCompatActivity(){
         }
 
         override fun onBindViewHolder(p0: ClassViewHolder, p1: Int) {
-            p0.setData(list.get(p1))
+            var string = list.get(p1) ?: return
+            with(string){
+                p0.setData(this)
+            }
         }
 
         inner class ClassViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
