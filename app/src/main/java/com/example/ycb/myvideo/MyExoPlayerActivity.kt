@@ -11,6 +11,7 @@ import android.database.Cursor
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
+import android.opengl.Visibility
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -22,7 +23,7 @@ import android.widget.SeekBar
 import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
-import com.example.ycb.myvideo.R.id.vseekbar_volume
+import com.example.ycb.myvideo.R.id.vseekbar_exo_volume
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
@@ -33,12 +34,17 @@ import kotlinx.android.synthetic.main.exoplayer_activity.*
 import kotlinx.android.synthetic.main.mediaplayer_activity.*
 import java.io.File
 import java.net.URI
+import java.security.KeyStore
 import java.util.*
 import java.util.logging.Logger
 import kotlin.concurrent.timerTask
+import kotlin.math.abs
+import kotlin.math.absoluteValue
+import kotlin.math.log
 
 /**
  * Created by biao on 2018/12/24.
+ * ExoPlay播放器
  */
 class MyExoPlayerActivity : AppCompatActivity(),OnOperationListener{
 
@@ -53,15 +59,61 @@ class MyExoPlayerActivity : AppCompatActivity(),OnOperationListener{
     private  lateinit var mGestureDetector : GestureDetector
 
     private  lateinit var mAudioManager : AudioManager
-    /** 当前声音  */
-    private  var mCurrentVolume : Int = 0
 
-    /** 最大声音  */
-    private var mMaxVolume: Int = 0
+    private  var mCurrentVolume : Int = 0 //当前音量
+
+    private var mMaxVolume: Int = 0//最大音量
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.exoplayer_activity)
+        initPlay()
+        setPlaySeekBar()
+        setVolume()
+    }
+
+    override fun startPlay() {
+        mPlayer.playWhenReady = true
+        tv_exo_seekbar_start.text = "暂停"
+        isStart = true
+    }
+
+    override fun stopPlay() {
+        isStart = false
+        tv_exo_seekbar_start.text = "开始"
+        mPlayer.playWhenReady = false
+    }
+
+
+    override fun onStop() {
+        super.onStop()
+        mPlayer.playWhenReady = false
+        isStart = false
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        mPlayer.playWhenReady = true
+        isStart = true
+    }
+
+    override fun onBackPressed() {
+        if(isFull){
+            isFull = false
+            tv_exo_seekbar_full.text = "全屏"
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        }else
+            super.onBackPressed()
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mPlayer.release()
+    }
+
+
+    private fun initPlay() {
         val trackSelector = DefaultTrackSelector()
         val renderersFactory = DefaultRenderersFactory(this)
         mPlayer = ExoPlayerFactory.newSimpleInstance(this, renderersFactory, trackSelector)
@@ -92,15 +144,41 @@ class MyExoPlayerActivity : AppCompatActivity(),OnOperationListener{
 
         })
 
+        btn_test_url.setOnClickListener {
+            val dataSourceFactory = DefaultHttpDataSourceFactory("ycb.myvideo")
+            val videoSource = ExtractorMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(Uri.parse(getString(R.string.url_video_test)))
+            mPlayer.prepare(videoSource)
+            startPlay()
+        }
+
+        btn_local_file.setOnClickListener {
+            if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                var hasReadPermission = checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                if (hasReadPermission != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(
+                        arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), REQUEST_CODE_ASK_PERMISSIONS);
+                }else{
+                    val intent : Intent = Intent(Intent.ACTION_GET_CONTENT)
+                    intent.setType("video/*")
+                    intent.addCategory(Intent.CATEGORY_OPENABLE)
+                    startActivityForResult(intent,1)
+                }
+            }
+        }
+    }
+
+    private fun setPlaySeekBar() {
+        group_exo_seekbar.visibility = View.GONE
+
         var handler = Handler {
             seekBar_exo.max = mPlayer.duration.toInt()
             seekBar_exo.progress = mPlayer.contentPosition.toInt()
             seekBar_exo.secondaryProgress = mPlayer.bufferedPosition.toInt()
-            time.text = mPlayer.contentPosition.div(1000).div(60).toString() + ":" + mPlayer.contentPosition.div(1000).rem(60).toString() +
+            tv_exo_seekbar_time.text = mPlayer.contentPosition.div(1000).div(60).toString() + ":" + mPlayer.contentPosition.div(1000).rem(60).toString() +
                     "/" + mPlayer.duration.div(1000).div(60).toString() + ":" + mPlayer.duration.div(1000).rem(60).toString()
             true
         }
-
 
         val timerTask : TimerTask = timerTask {
             if (isStart.and(!seekBar_exo.isPressed)) {
@@ -112,8 +190,9 @@ class MyExoPlayerActivity : AppCompatActivity(),OnOperationListener{
 
         seekBar_exo?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (fromUser) {
+                if (fromUser || seekBar!!.isPressed) {
                     mPlayer.seekTo(mPlayer.duration.times(progress).div(seekBar!!.max))
+
                 }
             }
 
@@ -124,7 +203,7 @@ class MyExoPlayerActivity : AppCompatActivity(),OnOperationListener{
             }
         })
 
-        start_exo.setOnClickListener {
+        tv_exo_seekbar_start.setOnClickListener {
             if(!isStart){
                 startPlay()
             }else{
@@ -132,7 +211,7 @@ class MyExoPlayerActivity : AppCompatActivity(),OnOperationListener{
             }
         }
 
-        tv_exo_full.setOnClickListener {
+        tv_exo_seekbar_full.setOnClickListener {
             if(!isFull){
                 val flagBack =  WindowManager.LayoutParams.FLAG_FULLSCREEN
                 val windowBack : Window = window
@@ -146,45 +225,24 @@ class MyExoPlayerActivity : AppCompatActivity(),OnOperationListener{
                 requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             }
         }
-
-        btn_test_url.setOnClickListener {
-            val dataSourceFactory = DefaultHttpDataSourceFactory("ycb.myvideo")
-            val videoSource = ExtractorMediaSource.Factory(dataSourceFactory)
-                .createMediaSource(Uri.parse(getString(R.string.url_video_test)))
-            mPlayer.prepare(videoSource)
-            startPlay()
-        }
-
-        btn_local_file.setOnClickListener {
-            if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-                var hasReadPermission = checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-                if (hasReadPermission != PackageManager.PERMISSION_GRANTED) {
-                         requestPermissions(
-                             arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), REQUEST_CODE_ASK_PERMISSIONS);
-                }else{
-                    val intent : Intent = Intent(Intent.ACTION_GET_CONTENT)
-                    intent.setType("video/*")
-                    intent.addCategory(Intent.CATEGORY_OPENABLE)
-                    startActivityForResult(intent,1)
-                }
-            }
-        }
-        setVolume()
     }
 
     private fun setVolume() {
-        vseekbar_volume.max = resources.getDimensionPixelOffset(R.dimen.video_height)
+        vseekbar_exo_volume.visibility = View.GONE
+        vseekbar_exo_volume.max = resources.getDimensionPixelOffset(R.dimen.video_height)
         mGestureDetector = GestureDetector(this,MyGestureListener())
         mAudioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         mMaxVolume = mAudioManager
             .getStreamMaxVolume(AudioManager.STREAM_MUSIC);
 
         mCurrentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
-        vseekbar_volume.progress = vseekbar_volume.max.times(mCurrentVolume.div(mMaxVolume.toFloat())).toInt()
-        vseekbar_volume.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+        vseekbar_exo_volume.progress = vseekbar_exo_volume.max.times(mCurrentVolume.div(mMaxVolume.toFloat())).toInt()
+        vseekbar_exo_volume.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (seekBar != null && seekBar.isPressed) {
                     mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,mMaxVolume.times(progress.div(seekBar.max.toFloat())).toInt(),0)
+
+
                 }
             }
 
@@ -198,59 +256,35 @@ class MyExoPlayerActivity : AppCompatActivity(),OnOperationListener{
 
         })
 
-        exo_surfaceV.setOnTouchListener { v, event ->
-            if(mGestureDetector.onTouchEvent(event)){
-                return@setOnTouchListener true
-            }else
-                super.onTouchEvent(event)
-        }
-    }
+        mGestureDetector.setIsLongpressEnabled(true)
 
-    //    override fun onTouchEvent(event: MotionEvent?): Boolean {
-//        if(mGestureDetector.onTouchEvent(event)){
-//            return true
-//        }
-//        return super.onTouchEvent(event)
-//    }
+        exo_surfaceV.isLongClickable = true
 
-    override fun startPlay() {
-        mPlayer.playWhenReady = true
-        start_exo.text = "暂停"
-        isStart = true
-    }
+        exo_surfaceV.isClickable = true
 
-    override fun stopPlay() {
-        isStart = false
-        start_exo.text = "开始"
-        mPlayer.playWhenReady = false
-    }
+        exo_surfaceV.isFocusable = true
 
+        exo_surfaceV.setOnTouchListener(object : View.OnTouchListener{
+            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+//                Log.i("setOnTouchListener",event?.action.toString())
+                mGestureDetector.onTouchEvent(event)
 
-    override fun onStop() {
-        super.onStop()
-        mPlayer.playWhenReady = false
-        isStart = false
-    }
+                when(event?.action){
 
-    override fun onRestart() {
-        super.onRestart()
-        mPlayer.playWhenReady = true
-        isStart = true
-    }
+                    MotionEvent.ACTION_DOWN -> {
+                        vseekbar_exo_volume.visibility = View.VISIBLE
+                        group_exo_seekbar.visibility = View.VISIBLE
+                    }
 
-    override fun onBackPressed() {
-        if(isFull){
-            isFull = false
-            tv_exo_full.text = "全屏"
-            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        }else
-        super.onBackPressed()
+                    MotionEvent.ACTION_UP -> {
+                        vseekbar_exo_volume.postDelayed({ vseekbar_exo_volume.visibility = View.GONE },3000)
+                        group_exo_seekbar.postDelayed({group_exo_seekbar.visibility = View.GONE},3000)
+                    }
+                }
 
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        mPlayer.release()
+                return true//一定要为true，不然只收到action_down
+            }
+        })
     }
 
     override fun onConfigurationChanged(newConfig: Configuration?) {
@@ -274,9 +308,38 @@ class MyExoPlayerActivity : AppCompatActivity(),OnOperationListener{
 
     inner class MyGestureListener : GestureDetector.SimpleOnGestureListener(){
         override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
-            Toast.makeText(this@MyExoPlayerActivity, distanceY.toString(),Toast.LENGTH_LONG).show()
-            vseekbar_volume.isPressed = true
-            vseekbar_volume.progress += distanceY.toInt()
+
+            var mOldX : Float = e1?.getX() ?: 0f
+            var mOldY : Float= e1?.getY() ?: 0f
+            var mX : Float= e2?.getX() ?: 0f
+            var mY : Float= e2?.getY() ?: 0f
+
+            Log.i("MyGestureListener onScroll = ", "mOldX = $mOldX || mX = $mX || mOldY = $mOldY || mY = $mY")
+
+            var disp = getWindowManager().getDefaultDisplay();
+            var windowWidth = disp.width;
+            var x: Int? = e1?.x?.toInt()
+
+            if(abs(mY - mOldY) > abs(mX - mOldX)){
+                if (x != null) {
+                    if(x > windowWidth/2 && distanceX in (-0.5).rangeTo(0.5)){//右边
+
+                        vseekbar_exo_volume.isPressed = true
+                        vseekbar_exo_volume.progress += distanceY.toInt()
+                    }else{
+                        //左边
+
+                    }
+                }
+            }
+
+            else{
+                seekBar_exo.isPressed = true
+                seekBar_exo.progress += (- distanceX * mPlayer.duration / windowWidth ).toInt()
+            }
+
+//            Log.i("MyGestureListener onScroll = ", "distanceY = $distanceY || distanceX = $distanceX")
+
             return true
         }
     }
@@ -323,9 +386,9 @@ class MyExoPlayerActivity : AppCompatActivity(),OnOperationListener{
     override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
         when(event?.keyCode){
             KeyEvent.KEYCODE_VOLUME_UP,KeyEvent.KEYCODE_VOLUME_DOWN ->{
-                vseekbar_volume.isPressed = false
+                vseekbar_exo_volume.isPressed = false
                 mCurrentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
-                vseekbar_volume.progress = vseekbar_volume.max.times(mCurrentVolume.div(mMaxVolume.toFloat())).toInt()
+                vseekbar_exo_volume.progress = vseekbar_exo_volume.max.times(mCurrentVolume.div(mMaxVolume.toFloat())).toInt()
             }
         }
         return super.dispatchKeyEvent(event)

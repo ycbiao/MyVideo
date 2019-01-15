@@ -22,7 +22,7 @@
 
         <activity
                 android:name=".MyExoPlayerActivity"
-                android:theme="@style/AppTheme"
+                android:theme="@style/NoTitleAppTheme"
                 android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity

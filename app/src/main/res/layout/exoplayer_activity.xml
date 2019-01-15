@@ -12,51 +12,54 @@
             android:id="@+id/seekBar_exo"
             android:layout_width="0dp"
             android:layout_height="30dp"
-            app:layout_constraintLeft_toRightOf="@id/start_exo"
-            app:layout_constraintRight_toLeftOf="@id/time"
+            app:layout_constraintLeft_toRightOf="@id/tv_exo_seekbar_start"
+            app:layout_constraintRight_toLeftOf="@id/tv_exo_seekbar_time"
             android:max="100"
             android:progress="0"
             android:secondaryProgress="0"
             app:layout_constraintBottom_toBottomOf="@id/exo_surfaceV"
             style="@style/Base.Widget.AppCompat.SeekBar"/>
     <TextView
-            android:id="@+id/tv_exo_full"
+            android:id="@+id/tv_exo_seekbar_full"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="全屏"
             app:layout_constraintBottom_toBottomOf="@id/exo_surfaceV"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/time"
-    app:layout_constraintTop_toTopOf="@id/seekBar_exo"
-    android:layout_marginRight="10dp"/>
-    <View android:layout_width="0dp"
+            app:layout_constraintLeft_toRightOf="@id/tv_exo_seekbar_time"
+            app:layout_constraintTop_toTopOf="@id/seekBar_exo"
+            android:layout_marginRight="10dp"/>
+    <View
+
+            android:layout_width="0dp"
           android:layout_height="30dp"
           app:layout_constraintLeft_toLeftOf="parent"
           app:layout_constraintRight_toRightOf="parent"
           app:layout_constraintBottom_toBottomOf="@id/exo_surfaceV"
-          android:background="#20000000" app:layout_constraintHorizontal_bias="0.0" android:id="@+id/view"/>
+          android:background="#20000000"
+            app:layout_constraintHorizontal_bias="0.0" android:id="@+id/view_bg_seekbar"/>
 
     <TextView
-            android:id="@+id/start_exo"
+            android:id="@+id/tv_exo_seekbar_start"
             android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-    android:text="开始"
-    app:layout_constraintTop_toTopOf="@id/seekBar_exo"
-    app:layout_constraintBottom_toBottomOf="@id/seekBar_exo"
-    app:layout_constraintLeft_toLeftOf="parent"
-    app:layout_constraintRight_toLeftOf="@id/seekBar_exo"
-    android:layout_marginLeft="10dp"/>
+            android:layout_height="wrap_content"
+            android:text="开始"
+            app:layout_constraintTop_toTopOf="@id/seekBar_exo"
+            app:layout_constraintBottom_toBottomOf="@id/seekBar_exo"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/seekBar_exo"
+            android:layout_marginLeft="10dp"/>
     <TextView
             android:text="time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/time"
-            app:layout_constraintRight_toLeftOf="@id/tv_exo_full"
-            app:layout_constraintBottom_toBottomOf="@+id/view"
-            app:layout_constraintTop_toTopOf="@+id/view"
+            android:id="@+id/tv_exo_seekbar_time"
+            app:layout_constraintRight_toLeftOf="@id/tv_exo_seekbar_full"
+            app:layout_constraintBottom_toBottomOf="@+id/view_bg_seekbar"
+            app:layout_constraintTop_toTopOf="@+id/view_bg_seekbar"
             app:layout_constraintLeft_toRightOf="@id/seekBar_exo"
             android:layout_marginRight="5dp"
-    android:layout_marginLeft="5dp"/>
+            android:layout_marginLeft="5dp"/>
 
     <Button
             android:id="@+id/btn_test_url"
@@ -65,19 +68,19 @@
             app:layout_constraintTop_toBottomOf="@id/exo_surfaceV"
             android:text="网络视频url"
             android:layout_margin="10dp"
-    app:layout_constraintLeft_toLeftOf="parent"
-    app:layout_constraintRight_toRightOf="parent"/>
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"/>
 
     <Button android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-    android:id="@+id/btn_local_file"
-    android:text="打开本地文件"
-    app:layout_constraintTop_toBottomOf="@id/btn_test_url"
-    app:layout_constraintLeft_toLeftOf="parent"
-    app:layout_constraintRight_toRightOf="parent"/>
+            android:id="@+id/btn_local_file"
+            android:text="打开本地文件"
+            app:layout_constraintTop_toBottomOf="@id/btn_test_url"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"/>
 
     <com.example.ycb.myvideo.widget.VerticalSeekBar
-            android:id="@+id/vseekbar_volume"
+            android:id="@+id/vseekbar_exo_volume"
             android:layout_width="30dp"
             android:layout_height="0dp"
             android:orientation="vertical"
@@ -90,4 +93,11 @@
             android:layout_marginTop="20dp"
             android:layout_marginBottom="50dp" app:layout_constraintVertical_bias="0.0"/>
 
+    
+    <android.support.constraint.Group
+            android:id="@+id/group_exo_seekbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            app:constraint_referenced_ids="tv_exo_seekbar_start,view_bg_seekbar,tv_exo_seekbar_time,tv_exo_seekbar_full,seekBar_exo"/>
 </android.support.constraint.ConstraintLayout>

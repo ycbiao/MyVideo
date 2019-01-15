@@ -23,17 +23,17 @@ class MainActivity : AppCompatActivity(){
         recycler_main.adapter = ClassRecyclerAdapter(this, arrayListOf("ExoPlayer播放器","MediaPlayer播放器(测试)"))
     }
 
-    class ClassRecyclerAdapter(var context: Context,var list: ArrayList<String>) : RecyclerView.Adapter<ClassRecyclerAdapter.ClassViewHolder>() {
+    class ClassRecyclerAdapter(var context: Context,var list: ArrayList<String>?) : RecyclerView.Adapter<ClassRecyclerAdapter.ClassViewHolder>() {
         override fun onCreateViewHolder(p0: ViewGroup, p1: Int): ClassViewHolder {
             return ClassViewHolder(View.inflate(context,R.layout.main_recycler_list,null))
         }
 
         override fun getItemCount(): Int {
-            return list.size
+            return list?.size?:0
         }
 
         override fun onBindViewHolder(p0: ClassViewHolder, p1: Int) {
-            var string = list.get(p1) ?: return
+            var string = list?.get(p1) ?: return
             with(string){
                 p0.setData(this)
             }
@@ -45,9 +45,9 @@ class MainActivity : AppCompatActivity(){
                 btn_class.text = string
                 btn_class.setOnClickListener {
 
-                    if(string.equals(list[0]))
+                    if(string.equals(list?.get(0)?:""))
                         context.startActivity(Intent(context,MyExoPlayerActivity::class.java))
-                    if(string.equals(list[1]))
+                    if(string.equals(list?.get(1)?:""))
                         context.startActivity(Intent(context,MyMediaPlayerActivity::class.java))
                 }
             }
