@@ -1,2 +1,2 @@
 # MyVideo
-kotlin 实现播放器
+kotlin 实现视频播放器
